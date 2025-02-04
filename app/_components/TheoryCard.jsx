@@ -6,72 +6,64 @@ import { updateTheoryLikes } from "../_lib/data-service"; // Assuming this funct
 
 const TheoryCard = ({ id, author, title, content, like, dislike }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
   const [likeCount, setLikeCount] = useState(like);
   const [dislikeCount, setDislikeCount] = useState(dislike);
+  const [currentURL, setCurrentURL] = useState("");
 
   useEffect(() => {
-    // Check if the user has liked the theory previously from localStorage
-    const likedTheory = localStorage.getItem(`liked-theory-${id}`);
-    if (likedTheory === "true") {
-      setIsLiked(true);
-    }
+    if (typeof window !== "undefined") {
+      setCurrentURL(window.location.href);
+      const likedTheory = localStorage.getItem(`liked-theory-${id}`);
+      const dislikedTheory = localStorage.getItem(`disliked-theory-${id}`);
 
-    // Check if the user has disliked the theory previously from localStorage
-    const dislikedTheory = localStorage.getItem(`disliked-theory-${id}`);
-    if (dislikedTheory === "true") {
-      setDislikeCount(1); // Set dislike state to 1 if already disliked
+      setIsLiked(likedTheory === "true");
+      setIsDisliked(dislikedTheory === "true");
     }
   }, [id]);
 
   const handleLike = async () => {
-    let updatedLikeCount;
-
     if (isLiked) {
-      updatedLikeCount = Math.max(likeCount - 1, 0); // Prevent likes from going below 0
-      localStorage.setItem(`liked-theory-${id}`, "false");
       setIsLiked(false);
+      setLikeCount((prev) => Math.max(prev - 1, 0));
+      localStorage.setItem(`liked-theory-${id}`, "false");
     } else {
-      updatedLikeCount = likeCount + 1;
-      localStorage.setItem(`liked-theory-${id}`, "true");
       setIsLiked(true);
+      setLikeCount((prev) => prev + 1);
+      localStorage.setItem(`liked-theory-${id}`, "true");
+
+      if (isDisliked) {
+        setIsDisliked(false);
+        setDislikeCount((prev) => Math.max(prev - 1, 0));
+        localStorage.setItem(`disliked-theory-${id}`, "false");
+      }
     }
 
-    // Update like count in state
-    setLikeCount(updatedLikeCount);
-
-    // Update the likes in the database with the updated like count
-    const result = await updateTheoryLikes(id, updatedLikeCount, dislikeCount);
-    if (result) {
-      console.log("Likes updated in DB");
-    } else {
-      console.log("Failed to update likes in DB");
-    }
+    await updateTheoryLikes(
+      id,
+      likeCount + (isLiked ? -1 : 1),
+      isDisliked ? 0 : dislikeCount
+    );
   };
 
   const handleDislike = async () => {
-    if (dislikeCount === 1) {
-      setDislikeCount(0); // Remove dislike if it's already disliked
+    if (isDisliked) {
+      setIsDisliked(false);
+      setDislikeCount(0);
       localStorage.setItem(`disliked-theory-${id}`, "false");
-
-      // Update the dislikes in the database
-      const result = await updateTheoryLikes(id, likeCount, 0);
-      if (result) {
-        console.log("Dislike removed in DB");
-      } else {
-        console.log("Failed to remove dislike in DB");
-      }
     } else {
-      setDislikeCount(1); // Set dislike count to 1 if it hasn't been disliked already
+      setIsDisliked(true);
+      setDislikeCount(1);
       localStorage.setItem(`disliked-theory-${id}`, "true");
 
-      // Update the dislikes in the database
-      const result = await updateTheoryLikes(id, likeCount, 1);
-      if (result) {
-        console.log("Dislike updated in DB");
-      } else {
-        console.log("Failed to update dislikes in DB");
+      if (isLiked) {
+        setIsLiked(false);
+        setLikeCount((prev) => Math.max(prev - 1, 0));
+        localStorage.setItem(`liked-theory-${id}`, "false");
       }
     }
+
+    await updateTheoryLikes(id, isLiked ? 0 : likeCount, isDisliked ? 0 : 1);
   };
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -79,23 +71,25 @@ const TheoryCard = ({ id, author, title, content, like, dislike }) => {
   return (
     <div className="pixel-border pixel-shadow bg-white text-black p-4 mb-4 hover:scale-[1.01] transition-transform duration-200">
       {/* Schema Markup for SEO (JSON-LD) */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            headline: title,
-            author: {
-              "@type": "Person",
-              name: author,
-            },
-            description: content.substring(0, 160),
-            datePublished: new Date().toISOString(),
-            url: window.location.href,
-          }),
-        }}
-      />
+      {currentURL && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              headline: title,
+              author: {
+                "@type": "Person",
+                name: author,
+              },
+              description: content.substring(0, 160),
+              datePublished: new Date().toISOString(),
+              url: currentURL,
+            }),
+          }}
+        />
+      )}
 
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center">
@@ -117,7 +111,7 @@ const TheoryCard = ({ id, author, title, content, like, dislike }) => {
             <FaThumbsDown
               onClick={handleDislike}
               className={`mr-1 ${
-                dislikeCount > 0 ? "text-red-500" : "text-pink-500"
+                isDisliked ? "text-red-500" : "text-pink-500"
               } cursor-pointer`}
               aria-label="Dislike this theory"
             />

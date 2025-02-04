@@ -24,6 +24,10 @@ const jersey25Charted = Jersey_25_Charted({
   variable: "--font-jersey-25-charted",
 });
 
+export const viewport = {
+  themeColor: "#ff0000",
+};
+
 export const metadata = {
   title: "Squid Game Theories 🦑 | Hidden Secrets & Season 3 Predictions",
   description:
@@ -40,7 +44,6 @@ export const metadata = {
     "Squid Game Netflix",
   ],
   author: "Squid Game Theory Hub",
-  themeColor: "#ff0000",
   openGraph: {
     title: "Squid Game Theories 🦑 | Hidden Secrets & Season 3 Predictions",
     description:
