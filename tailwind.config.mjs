@@ -7,9 +7,16 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      animation: {
+        "shake-delay": "shake 0.8s ease-in-out 0s infinite", // Shake every 3 seconds
+      },
+      keyframes: {
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-4px)" },
+          "50%": { transform: "translateX(4px)" },
+          "75%": { transform: "translateX(-2px)" },
+        },
       },
     },
   },
