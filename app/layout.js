@@ -27,7 +27,7 @@ const jersey25Charted = Jersey_25_Charted({
 });
 
 export const viewport = {
-  themeColor: "#ff0000",
+  themeColor: "#F70A8D",
 };
 
 export const metadata = {

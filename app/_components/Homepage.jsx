@@ -5,8 +5,9 @@ import { FaMask } from "react-icons/fa";
 import TheoryCard from "./TheoryCard";
 import PixelButton from "./PixelButton";
 import Link from "next/link";
+import Countdown from "./Countdown";
 
-export default function Homepage({ theories }) {
+export default function Homepage({ theories, theory_count }) {
   const [sortMethod, setSortMethod] = useState("latest");
 
   // Function to shuffle the theories randomly
@@ -42,6 +43,12 @@ export default function Homepage({ theories }) {
           <FaMask className="mr-4" /> Squid Game Theories
           <FaMask className="ml-4" />
         </h1>
+        <div className="flex items-center gap-2 justify-center py-5 text-xl">
+          {theory_count} theories submitted
+        </div>
+        <div>
+          <Countdown />
+        </div>
         <Link href="/create">
           <div className="min-w-full flex items-center justify-center justify-self-center">
             <div className="mb-4 pixel-border pixel-shadow bg-pink-500 text-white px-4 py-2 hover:bg-pink-600 transition-all duration-200 w-full sm:w-md text-center sm:max-w-sm relative overflow-hidden ">
