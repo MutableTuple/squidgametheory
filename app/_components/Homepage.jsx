@@ -6,6 +6,7 @@ import TheoryCard from "./TheoryCard";
 import PixelButton from "./PixelButton";
 import Link from "next/link";
 import Countdown from "./Countdown";
+import PHTag from "./PHTag";
 
 export default function Homepage({ theories, theory_count }) {
   const [sortMethod, setSortMethod] = useState("latest");
@@ -43,9 +44,10 @@ export default function Homepage({ theories, theory_count }) {
           <FaMask className="mr-4" /> Squid Game Theories
           <FaMask className="ml-4" />
         </h1>
-        <div className="flex items-center gap-2 justify-center py-5 text-xl">
+        <div className="flex items-center gap-2 justify-center my-3 text-xl">
           {theory_count} theories submitted
         </div>
+        <PHTag />
         <div>
           <Countdown />
         </div>
